@@ -23,9 +23,14 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://demo2107582.mockable.io\"")
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -53,6 +58,12 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.okhttp.logging)
+    implementation(libs.retrofit.core)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.moshi.converter)
+    implementation(libs.kotlinx.serialization.json)
 
     ksp(libs.hilt.compiler)
 
