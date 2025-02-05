@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.tcp.smarttasks.databinding.FragmentSplashBinding
 import com.tcp.smarttasks.view.TasksViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -38,6 +39,8 @@ class SplashFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.fetchTasks().collect { _ ->
                     Timber.d("Tasks fetched")
+                    // Delay here to appreciate the nice splash screen
+                    delay(1000)
                     findNavController().navigate(
                         SplashFragmentDirections.actionSplashFragmentToTasksFragment()
                     )
