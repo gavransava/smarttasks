@@ -36,7 +36,7 @@ class SplashFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.fetchTasks().collect { tasks ->
+                viewModel.fetchTasks().collect { _ ->
                     Timber.d("Tasks fetched")
                     findNavController().navigate(
                         SplashFragmentDirections.actionSplashFragmentToTasksFragment()

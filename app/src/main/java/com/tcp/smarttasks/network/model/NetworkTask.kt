@@ -5,7 +5,7 @@ import com.squareup.moshi.JsonClass
 
 
 @JsonClass(generateAdapter = true)
-data class Task(
+data class NetworkTask(
     @Json(name = "id") val id: String,
     @Json(name = "TargetDate") val targetDate: String?,
     @Json(name = "DueDate") val dueDate: String?,

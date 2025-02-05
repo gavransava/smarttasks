@@ -65,7 +65,10 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.moshi.converter)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
 
+    ksp(libs.room.compiler)
     ksp(libs.hilt.compiler)
 
     testImplementation(libs.junit)

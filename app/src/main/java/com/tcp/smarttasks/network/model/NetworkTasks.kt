@@ -5,5 +5,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class NetworkTasks(
-    @Json(name = "tasks") val tasks: List<Task>
+    @Json(name = "tasks") val tasks: List<NetworkTask>
 )
