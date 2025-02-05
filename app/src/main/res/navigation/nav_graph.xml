@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             android:id="@+id/nav_graph">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splash_fragment">
+
+    <fragment
+        android:id="@+id/splash_fragment"
+        android:name="com.tcp.smarttasks.view.splash.SplashFragment">
+        <action
+            android:id="@+id/action_splash_fragment_to_tasks_fragment"
+            app:destination="@id/tasks_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/tasks_fragment"
+        android:name="com.tcp.smarttasks.view.tasks.TasksFragment">
+        <action
+            android:id="@+id/action_tasks_fragment_to_task_details_fragment"
+            app:destination="@id/task_details_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/task_details_fragment"
+        android:name="com.tcp.smarttasks.view.tasks.TaskDetailsFragment">
+    </fragment>
 
 </navigation>

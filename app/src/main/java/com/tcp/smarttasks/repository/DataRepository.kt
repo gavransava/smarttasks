@@ -5,5 +5,5 @@ import com.tcp.smarttasks.network.model.NetworkTasks
 import kotlinx.coroutines.flow.Flow
 
 interface DataRepository {
-    suspend fun requestTasks(): Flow<Resource<NetworkTasks>>
+    fun fetchTasks(): Flow<Resource<NetworkTasks>>
 }

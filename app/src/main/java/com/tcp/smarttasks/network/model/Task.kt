@@ -1,14 +1,15 @@
 package com.tcp.smarttasks.network.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-@Serializable
+
+@JsonClass(generateAdapter = true)
 data class Task(
-    @SerialName("id") val id: String,
-    @SerialName("TargetDate") val targetDate: String,
-    @SerialName("DueDate") val dueDate: String,
-    @SerialName("Title") val title: String,
-    @SerialName("Description") val description: String,
-    @SerialName("Priority") val priority: Int
+    @Json(name = "id") val id: String,
+    @Json(name = "TargetDate") val targetDate: String?,
+    @Json(name = "DueDate") val dueDate: String?,
+    @Json(name = "Title") val title: String?,
+    @Json(name = "Description") val description: String?,
+    @Json(name = "Priority") val priority: Int?
 )

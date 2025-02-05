@@ -28,7 +28,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://demo2107582.mockable.io\"")
+            buildConfigField("String", "BASE_URL", "\"https://demo2107582.mockable.io\"")
         }
 
         release {
@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.okhttp.logging)
     implementation(libs.retrofit.core)
+    implementation(libs.timber)
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
     implementation(libs.moshi.converter)

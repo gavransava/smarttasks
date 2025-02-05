@@ -1,9 +1,9 @@
 package com.tcp.smarttasks.network.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-@Serializable
+@JsonClass(generateAdapter = true)
 data class NetworkTasks(
-    @SerialName("tasks") val tasks: List<Task>
+    @Json(name = "tasks") val tasks: List<Task>
 )
