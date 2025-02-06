@@ -10,9 +10,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.tcp.smarttasks.databinding.FragmentTasksBinding
+import com.tcp.smarttasks.util.showErrorDialog
 import com.tcp.smarttasks.view.TasksViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class TasksFragment : Fragment() {
@@ -33,8 +35,32 @@ class TasksFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-
+                viewModel.tasks.collect { uiState ->
+                    handleUiState(uiState)
+                }
             }
         }
+    }
+
+    private fun handleUiState(uiState: TasksViewModel.TasksUiState) {
+        when (uiState) {
+            TasksViewModel.TasksUiState.InitialState -> {}
+            TasksViewModel.TasksUiState.Loading -> {
+                // show some loader (not in UI spec)
+            }
+
+            is TasksViewModel.TasksUiState.Success -> {
+                // feed adapter
+                Timber.d("feed adapter")
+            }
+
+            is TasksViewModel.TasksUiState.Error -> {
+                showErrorDialog(TAG, uiState.message)
+            }
+        }
+    }
+
+    companion object {
+        const val TAG = "TasksFragment"
     }
 }

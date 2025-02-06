@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SmartTasks</string>
+    <string name="ok">Ok</string>
+    <string name="error_occurred">Something went wrong</string>
 </resources>
