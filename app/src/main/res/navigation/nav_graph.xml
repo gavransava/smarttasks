@@ -9,7 +9,9 @@
         android:name="com.tcp.smarttasks.view.splash.SplashFragment">
         <action
             android:id="@+id/action_splash_fragment_to_tasks_fragment"
-            app:destination="@id/tasks_fragment" />
+            app:destination="@id/tasks_fragment"
+            app:popUpTo="@id/splash_fragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -22,7 +24,6 @@
 
     <fragment
         android:id="@+id/task_details_fragment"
-        android:name="com.tcp.smarttasks.view.tasks.TaskDetailsFragment">
-    </fragment>
+        android:name="com.tcp.smarttasks.view.tasks.TaskDetailsFragment" />
 
 </navigation>

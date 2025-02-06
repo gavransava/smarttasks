@@ -2,4 +2,10 @@
     <string name="app_name">SmartTasks</string>
     <string name="ok">Ok</string>
     <string name="error_occurred">Something went wrong</string>
+    <string name="left_arrow">Left Arrow</string>
+    <string name="right_arrow">Right Arrow</string>
+    <string name="due_date">Due date</string>
+    <string name="days_left">Days left</string>
+    <string name="today">Today</string>
+    <string name="no_tasks_for_today">No tasks for today!</string>
 </resources>
