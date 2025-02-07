@@ -21,7 +21,7 @@ class DataRepositoryImpl @Inject constructor(
     private val tasksDao: TasksDao
 ) : DataRepository {
 
-    fun getAllTasks(): Flow<List<Task>> {
+    override fun getAllTasks(): Flow<List<Task>> {
         return tasksDao.getAllTasks().map { taskEntities -> taskEntities.map { it.toDomain() } }
     }
 
@@ -50,5 +50,9 @@ class DataRepositoryImpl @Inject constructor(
                 }
             }
         }.flowOn(ioDispatcher)
+    }
+
+    override fun getTask(taskId: String): Task {
+        return tasksDao.getTaskById(taskId).toDomain()
     }
 }

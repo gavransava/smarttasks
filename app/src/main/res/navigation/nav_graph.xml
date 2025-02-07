@@ -24,6 +24,10 @@
 
     <fragment
         android:id="@+id/task_details_fragment"
-        android:name="com.tcp.smarttasks.view.tasks.TaskDetailsFragment" />
+        android:name="com.tcp.smarttasks.view.tasks.TaskDetailsFragment">
 
+        <argument
+            android:name="taskId"
+            app:argType="string" />
+    </fragment>
 </navigation>

@@ -5,19 +5,18 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.tcp.smarttasks.R
 import com.tcp.smarttasks.data.domain.Task
 import com.tcp.smarttasks.databinding.TaskItemBinding
 import com.tcp.smarttasks.util.DateUtil
-import java.time.LocalDate
 
-class TasksListAdapter(val context: Context) : RecyclerView.Adapter<TasksListAdapter.TaskViewHolder>() {
+class TasksListAdapter(val context: Context, private val itemClickListener: (String) -> Unit) :
+    RecyclerView.Adapter<TasksListAdapter.TaskViewHolder>() {
 
     private var taskList: List<Task> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val binding = TaskItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return TaskViewHolder(binding, context)
+        return TaskViewHolder(binding, context, itemClickListener)
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
@@ -36,24 +35,20 @@ class TasksListAdapter(val context: Context) : RecyclerView.Adapter<TasksListAda
         diffResult.dispatchUpdatesTo(this)
     }
 
-    class TaskViewHolder(private val binding: TaskItemBinding, private val context: Context) :
-        RecyclerView.ViewHolder(binding.root) {
+    class TaskViewHolder(
+        private val binding: TaskItemBinding,
+        private val context: Context,
+        private val itemClickListener: (String) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(task: Task) {
-            binding.tvTitle.text = task.title
-            binding.tvDueDate.text = task.dueDate ?: "N/A"
+            binding.taskItemContents.tvTitle.text = task.title
+            binding.taskItemContents.tvDueDate.text = DateUtil.formatDueDate(task.dueDate)
+            binding.taskItemContents.tvDaysLeft.text = DateUtil.calculateDaysLeft(task.dueDate, context)
 
-            try {
-                if (task.dueDate != null) {
-                    val daysLeft = DateUtil.calculateDaysDifference(DateUtil.formatLocalDate(LocalDate.now()), task.dueDate)
-                    binding.tvDaysLeft.text = "$daysLeft"
-                } else {
-                    binding.tvDaysLeft.text = "N/A"
-                }
-            } catch (e: IllegalArgumentException) {
-                binding.tvDaysLeft.text = context.getString(R.string.overdue)
+            binding.container.setOnClickListener {
+                itemClickListener.invoke(task.id)
             }
-
         }
     }
 

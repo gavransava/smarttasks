@@ -11,7 +11,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tcp.smarttasks.R
 import com.tcp.smarttasks.data.domain.Task
 import com.tcp.smarttasks.databinding.FragmentTasksBinding
 import com.tcp.smarttasks.util.DateUtil
@@ -19,7 +21,6 @@ import com.tcp.smarttasks.util.showErrorDialog
 import com.tcp.smarttasks.view.TasksViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.LocalDate
 
 @AndroidEntryPoint
@@ -44,7 +45,9 @@ class TasksFragment : Fragment() {
 
         val recyclerView = binding.rvTasks
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        tasksListAdapter = TasksListAdapter(requireContext())
+        tasksListAdapter = TasksListAdapter(requireContext()) { taskId ->
+            taskSelected(taskId)
+        }
         recyclerView.adapter = tasksListAdapter
 
         setOnClickListeners()
@@ -56,6 +59,12 @@ class TasksFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun taskSelected(taskId: String) {
+        findNavController().navigate(
+            TasksFragmentDirections.actionTasksFragmentToTaskDetailsFragment(taskId)
+        )
     }
 
     private fun setOnClickListeners() {
@@ -71,9 +80,17 @@ class TasksFragment : Fragment() {
     }
 
     private fun updateAdapter() {
-        binding.header.titleDateLabel.text = DateUtil.formatLocalDate(selectedDate)
+        binding.header.titleDateLabel.text =
+            if (selectedDate == LocalDate.now()) getString(R.string.today) else DateUtil.localDateUIFormat(
+                selectedDate
+            )
         val tasksForSelectedDate = filterTasksForSelectedDate(tasksData)
         tasksListAdapter.submitList(tasksForSelectedDate)
+        binding.rvTasks.scrollToPosition(0)
+        updateNoTaskView(tasksForSelectedDate)
+    }
+
+    private fun updateNoTaskView(tasksForSelectedDate: List<Task>) {
         if (tasksForSelectedDate.isEmpty()) {
             binding.ivNoTasks.visibility = VISIBLE
             binding.tvNoTasks.visibility = VISIBLE
@@ -92,9 +109,7 @@ class TasksFragment : Fragment() {
 
             is TasksViewModel.TasksUiState.Success -> {
                 tasksData = uiState.data.toMutableList()
-
-                val tasksForSelectedDate = filterTasksForSelectedDate(uiState.data)
-                tasksListAdapter.submitList(tasksForSelectedDate)
+                updateAdapter()
             }
 
             is TasksViewModel.TasksUiState.Error -> {
@@ -105,14 +120,7 @@ class TasksFragment : Fragment() {
 
     private fun filterTasksForSelectedDate(data: List<Task>): List<Task> {
         return data.filter {
-            try {
-                DateUtil.isDateBetween(
-                    DateUtil.formatLocalDate(selectedDate), it.targetDate, it.dueDate
-                )
-            } catch (e: IllegalArgumentException) {
-                Timber.d(e.message)
-                false
-            }
+            DateUtil.formatLocalDate(selectedDate) == it.targetDate
         }
     }
 

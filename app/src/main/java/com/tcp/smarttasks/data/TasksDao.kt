@@ -15,6 +15,10 @@ abstract class TasksDao {
     @Query("SELECT * FROM tasks ORDER BY priority DESC, DATE(target_date) ASC")
     abstract fun getAllTasks(): Flow<List<TaskEntity>>
 
+    @Transaction
+    @Query("SELECT * FROM tasks WHERE id = :taskId")
+    abstract fun getTaskById(taskId: String): TaskEntity
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun saveTasks(tasks: List<TaskEntity>)
 

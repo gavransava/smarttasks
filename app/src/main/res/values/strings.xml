@@ -8,5 +8,9 @@
     <string name="days_left">Days left</string>
     <string name="today">Today</string>
     <string name="no_tasks_for_today">No tasks for today!</string>
-    <string name="overdue">Overdue</string>
+    <string name="overdue">0</string>
+    <string name="task_detail">Task Detail</string>
+    <string name="resolve">Resolve</string>
+    <string name="cant_resolve">Can\'t resolve</string>
+    <string name="unresolved">Unresolved</string>
 </resources>

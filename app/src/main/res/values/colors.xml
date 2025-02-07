@@ -7,4 +7,5 @@
     <color name="st_green">#00897b</color>
     <color name="st_beige">#F6EFDE</color>
     <color name="st_red">#EF4B5E</color>
+    <color name="ripple_color">#33ffffff</color>
 </resources>

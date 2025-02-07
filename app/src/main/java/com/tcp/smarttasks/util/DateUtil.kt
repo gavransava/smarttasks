@@ -1,11 +1,18 @@
 package com.tcp.smarttasks.util
 
+import android.content.Context
+import com.tcp.smarttasks.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 
 object DateUtil {
+
+    fun localDateUIFormat(date: LocalDate): String {
+        val dateFormatter = DateTimeFormatter.ofPattern("MMM dd yyyy")
+        return date.format(dateFormatter)
+    }
 
     fun formatLocalDate(date: LocalDate): String {
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -25,25 +32,27 @@ object DateUtil {
         return ChronoUnit.DAYS.between(targetDate, dueDate)
     }
 
-    fun isDateBetween(
-        selectedDate: String,
-        targetDateString: String,
-        dueDateString: String?
-    ): Boolean {
-
-        val targetDate = parseDateString(targetDateString)
-        val checkDate = parseDateString(selectedDate)
-
-        if (dueDateString == null) {
-            return checkDate.isEqual(targetDate) || checkDate.isAfter(targetDate)
+    fun formatDueDate(dueDate: String?): String {
+        return if (!dueDate.isNullOrEmpty()) {
+            localDateUIFormat(parseDateString(dueDate))
         } else {
-            val dueDate = parseDateString(dueDateString)
+            "N/A"
+        }
+    }
 
-            require(!targetDate.isAfter(dueDate)) { "targetDate must be earlier than dueDate" }
-
-            return checkDate.isEqual(targetDate) || (checkDate.isAfter(targetDate) && checkDate.isBefore(
-                dueDate
-            )) || checkDate.isEqual(dueDate)
+    fun calculateDaysLeft(dueDate: String?, context: Context): String {
+        return try {
+            if (!dueDate.isNullOrEmpty()) {
+                val daysLeft = calculateDaysDifference(
+                    formatLocalDate(LocalDate.now()),
+                    dueDate
+                )
+                "$daysLeft"
+            } else {
+                "N/A"
+            }
+        } catch (e: IllegalArgumentException) {
+            context.getString(R.string.overdue)
         }
     }
 }
