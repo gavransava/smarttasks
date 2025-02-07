@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 abstract class TasksDao {
 
     @Transaction
-    @Query("SELECT * FROM tasks")
+    @Query("SELECT * FROM tasks ORDER BY priority DESC, DATE(target_date) ASC")
     abstract fun getAllTasks(): Flow<List<TaskEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

@@ -36,7 +36,7 @@ class DataRepositoryImpl @Inject constructor(
                     if (response.isSuccessful) {
                         response.body()?.let { networkTasks ->
                             val tasks = networkTasks.tasks.filter {
-                                it.targetDate != null && it.title != null && it.description != null
+                                it.targetDate != null && it.title != null
                             }.map { it.toDomain() }
 
                             tasksDao.saveTasks(tasks.map { it.toEntity() })

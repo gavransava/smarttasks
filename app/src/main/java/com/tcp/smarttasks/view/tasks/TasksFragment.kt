@@ -27,7 +27,7 @@ class TasksFragment : Fragment() {
 
     private lateinit var binding: FragmentTasksBinding
     private val viewModel: TasksViewModel by activityViewModels()
-    private val tasksListAdapter = TasksListAdapter()
+    private lateinit var tasksListAdapter: TasksListAdapter
     private var selectedDate = LocalDate.now()
     private var tasksData = mutableListOf<Task>()
 
@@ -44,6 +44,7 @@ class TasksFragment : Fragment() {
 
         val recyclerView = binding.rvTasks
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        tasksListAdapter = TasksListAdapter(requireContext())
         recyclerView.adapter = tasksListAdapter
 
         setOnClickListeners()
@@ -73,7 +74,7 @@ class TasksFragment : Fragment() {
         binding.header.titleDateLabel.text = DateUtil.formatLocalDate(selectedDate)
         val tasksForSelectedDate = filterTasksForSelectedDate(tasksData)
         tasksListAdapter.submitList(tasksForSelectedDate)
-        if(tasksForSelectedDate.isEmpty()){
+        if (tasksForSelectedDate.isEmpty()) {
             binding.ivNoTasks.visibility = VISIBLE
             binding.tvNoTasks.visibility = VISIBLE
         } else {

@@ -1,20 +1,23 @@
 package com.tcp.smarttasks.view.tasks
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.tcp.smarttasks.R
 import com.tcp.smarttasks.data.domain.Task
 import com.tcp.smarttasks.databinding.TaskItemBinding
 import com.tcp.smarttasks.util.DateUtil
+import java.time.LocalDate
 
-class TasksListAdapter : RecyclerView.Adapter<TasksListAdapter.TaskViewHolder>() {
+class TasksListAdapter(val context: Context) : RecyclerView.Adapter<TasksListAdapter.TaskViewHolder>() {
 
     private var taskList: List<Task> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val binding = TaskItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return TaskViewHolder(binding)
+        return TaskViewHolder(binding, context)
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
@@ -33,7 +36,7 @@ class TasksListAdapter : RecyclerView.Adapter<TasksListAdapter.TaskViewHolder>()
         diffResult.dispatchUpdatesTo(this)
     }
 
-    class TaskViewHolder(private val binding: TaskItemBinding) :
+    class TaskViewHolder(private val binding: TaskItemBinding, private val context: Context) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(task: Task) {
@@ -42,13 +45,13 @@ class TasksListAdapter : RecyclerView.Adapter<TasksListAdapter.TaskViewHolder>()
 
             try {
                 if (task.dueDate != null) {
-                    val daysLeft = DateUtil.calculateDaysDifference(task.targetDate, task.dueDate)
+                    val daysLeft = DateUtil.calculateDaysDifference(DateUtil.formatLocalDate(LocalDate.now()), task.dueDate)
                     binding.tvDaysLeft.text = "$daysLeft"
                 } else {
                     binding.tvDaysLeft.text = "N/A"
                 }
             } catch (e: IllegalArgumentException) {
-                binding.tvDaysLeft.text = "N/A"
+                binding.tvDaysLeft.text = context.getString(R.string.overdue)
             }
 
         }
@@ -71,5 +74,4 @@ class TasksListAdapter : RecyclerView.Adapter<TasksListAdapter.TaskViewHolder>()
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
     }
-
 }
