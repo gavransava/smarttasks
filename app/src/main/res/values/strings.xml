@@ -19,4 +19,5 @@
     <string name="enter_comment">Enter Comment</string>
     <string name="enter_comment_title">Do you want to leave a comment?</string>
     <string name="user_comment">User comment</string>
+    <string name="task_status_icon">Task Status Icon</string>
 </resources>

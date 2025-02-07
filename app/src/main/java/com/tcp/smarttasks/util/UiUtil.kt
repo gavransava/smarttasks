@@ -22,7 +22,7 @@ fun AlertDialog.Builder.showAddCommentDialog(
     listener: (string: String) -> Unit
 ) {
     val context = this.context
-     val inputField = EditText(context)
+    val inputField = EditText(context)
     inputField.hint = context.getString(R.string.enter_comment)
 
     val layout = LinearLayout(context)
@@ -40,10 +40,15 @@ fun AlertDialog.Builder.showAddCommentDialog(
         listener("")
         dialog.dismiss()
     }
-
     this.setView(layout)
 
     val dialog = this.create()
+    dialog.setOnShowListener {
+        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+        positiveButton.setTextColor(context.getColor(R.color.black))
+        negativeButton.setTextColor(context.getColor(R.color.black))
+    }
     dialog.show()
 }
 
