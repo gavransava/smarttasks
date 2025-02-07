@@ -13,4 +13,5 @@
     <string name="resolve">Resolve</string>
     <string name="cant_resolve">Can\'t resolve</string>
     <string name="unresolved">Unresolved</string>
+    <string name="resolved">Resolved</string>
 </resources>

@@ -2,6 +2,8 @@ package com.tcp.smarttasks.repository
 
 import com.tcp.smarttasks.data.TasksDao
 import com.tcp.smarttasks.data.domain.Task
+import com.tcp.smarttasks.data.domain.TaskStatus
+import com.tcp.smarttasks.data.entity.TaskAdditionalDataEntity
 import com.tcp.smarttasks.data.mapper.toDomain
 import com.tcp.smarttasks.data.mapper.toEntity
 import com.tcp.smarttasks.network.Resource
@@ -52,7 +54,16 @@ class DataRepositoryImpl @Inject constructor(
         }.flowOn(ioDispatcher)
     }
 
-    override fun getTask(taskId: String): Task {
-        return tasksDao.getTaskById(taskId).toDomain()
+    override fun getTask(taskId: String): Flow<Task> {
+        return tasksDao.getTaskWithAdditionalDataById(taskId).map { task -> task.toDomain() }
+    }
+
+    override suspend fun setTaskStatus(taskId: String, status: TaskStatus) {
+        tasksDao.saveTaskAdditionalData(
+            TaskAdditionalDataEntity(
+                taskId = taskId,
+                taskStatus = status
+            )
+        )
     }
 }
