@@ -85,8 +85,8 @@ class TasksViewModel @Inject constructor(
     /**
      * Update task status to RESOLVED or UNRESOLVED state.
      */
-    suspend fun setTaskStatus(taskId: String, status: TaskStatus) {
-        dataRepositoryImpl.setTaskStatus(taskId, status)
+    suspend fun setTaskStatus(taskId: String, status: TaskStatus, comment: String) {
+        dataRepositoryImpl.setTaskStatus(taskId, status, comment)
     }
 
     sealed class TasksUiState {

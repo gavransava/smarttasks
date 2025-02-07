@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -18,9 +19,9 @@ import com.tcp.smarttasks.data.domain.Task
 import com.tcp.smarttasks.data.domain.TaskStatus
 import com.tcp.smarttasks.databinding.FragmentTaskDetailsBinding
 import com.tcp.smarttasks.util.DateUtil
+import com.tcp.smarttasks.util.showAddCommentDialog
 import com.tcp.smarttasks.view.TasksViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -45,6 +46,9 @@ class TaskDetailsFragment : Fragment() {
             viewModel.getTask(it)
         }
         binding.task.tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f)
+        binding.ibBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
@@ -63,7 +67,14 @@ class TaskDetailsFragment : Fragment() {
         binding.task.tvDaysLeft.text = DateUtil.calculateDaysLeft(task.dueDate, requireContext())
         binding.description.text = task.description
 
-        when(task.status){
+        if (!task.userComment.isNullOrEmpty()) {
+            binding.userCommentLabel.visibility = VISIBLE
+            binding.userComment.visibility = VISIBLE
+            binding.separator3.visibility = VISIBLE
+            binding.userComment.text = task.userComment
+        }
+
+        when (task.status) {
             TaskStatus.UNRESOLVED -> {
                 setTextColorBasedOnStatus(resources.getColor(R.color.st_red, requireContext().theme))
                 binding.ivTaskStatus.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.unresolved_sign, requireContext().theme))
@@ -75,22 +86,34 @@ class TaskDetailsFragment : Fragment() {
                 binding.ivTaskStatus.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.sign_resolved, requireContext().theme))
                 hideStatusButtons()
             }
-            null -> {}
-        }
-
-        binding.ibBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
-        binding.btnResolve.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setTaskStatus(taskId = task.id, status = TaskStatus.RESOLVED)
+            null -> {
+                showStatusButtons()
             }
         }
 
-        binding.btnCantResolve.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setTaskStatus(taskId = task.id, status = TaskStatus.UNRESOLVED)
+        if (binding.btnResolve.visibility == VISIBLE && binding.btnCantResolve.visibility == VISIBLE) {
+            binding.btnResolve.setOnClickListener {
+                showAddCommentDialog { comment ->
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.setTaskStatus(
+                            taskId = task.id,
+                            status = TaskStatus.RESOLVED,
+                            comment = comment
+                        )
+                    }
+                }
+            }
+
+            binding.btnCantResolve.setOnClickListener {
+                showAddCommentDialog { comment ->
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.setTaskStatus(
+                            taskId = task.id,
+                            status = TaskStatus.UNRESOLVED,
+                            comment = comment
+                        )
+                    }
+                }
             }
         }
     }
@@ -100,6 +123,11 @@ class TaskDetailsFragment : Fragment() {
         binding.task.tvDueDate.setTextColor(color)
         binding.task.tvDaysLeft.setTextColor(color)
         binding.taskStatus.setTextColor(color)
+    }
+
+    private fun showStatusButtons() {
+        binding.btnResolve.visibility = VISIBLE
+        binding.btnCantResolve.visibility = VISIBLE
     }
 
     private fun hideStatusButtons() {

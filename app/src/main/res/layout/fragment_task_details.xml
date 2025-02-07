@@ -63,10 +63,10 @@
             app:layout_constraintTop_toBottomOf="@id/task" />
 
         <ScrollView
+            android:id="@+id/descriptionScroll"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_margin="10dp"
-            app:layout_constraintBottom_toTopOf="@id/separator2"
             app:layout_constraintTop_toBottomOf="@id/separator1">
 
             <TextView
@@ -80,10 +80,49 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="7dp"
             android:background="@color/st_beige"
-            app:layout_constraintBottom_toTopOf="@id/taskStatus" />
+            app:layout_constraintTop_toBottomOf="@id/descriptionScroll" />
+
+        <TextView
+            android:id="@+id/userCommentLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/user_comment"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/separator2" />
+
+        <TextView
+            android:id="@+id/userComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="10dp"
+            android:ellipsize="end"
+            android:maxLines="6"
+            android:maxHeight="100dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/userCommentLabel" />
+
+        <View
+            android:id="@+id/separator3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/st_beige"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/userComment" />
 
         <TextView
             android:id="@+id/taskStatus"
@@ -91,12 +130,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="7dp"
             android:layout_marginBottom="10dp"
             android:text="@string/unresolved"
             android:textColor="@color/st_yellow"
             android:textSize="15sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/separator3" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -107,6 +148,7 @@
         android:layout_marginTop="10dp"
         android:backgroundTint="@color/st_green"
         android:text="@string/resolve"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@id/btnCantResolve"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/taskDetails" />
@@ -119,6 +161,7 @@
         android:layout_marginEnd="15dp"
         android:backgroundTint="@color/st_red"
         android:text="@string/cant_resolve"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/btnResolve"
         app:layout_constraintTop_toBottomOf="@id/taskDetails" />
@@ -127,7 +170,7 @@
         android:id="@+id/ivTaskStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/taskDetails" />

@@ -11,5 +11,5 @@ interface DataRepository {
     fun fetchTasks(): Flow<Resource<List<Task>>>
     fun getTask(taskId: String): Flow<Task>
 
-    suspend fun setTaskStatus(taskId: String, status: TaskStatus)
+    suspend fun setTaskStatus(taskId: String, status: TaskStatus, comment: String)
 }

@@ -58,11 +58,12 @@ class DataRepositoryImpl @Inject constructor(
         return tasksDao.getTaskWithAdditionalDataById(taskId).map { task -> task.toDomain() }
     }
 
-    override suspend fun setTaskStatus(taskId: String, status: TaskStatus) {
+    override suspend fun setTaskStatus(taskId: String, status: TaskStatus, comment: String) {
         tasksDao.saveTaskAdditionalData(
             TaskAdditionalDataEntity(
                 taskId = taskId,
-                taskStatus = status
+                taskStatus = status,
+                userComment = comment
             )
         )
     }
