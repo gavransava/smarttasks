@@ -8,6 +8,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -46,12 +47,10 @@ class TaskDetailsFragment : Fragment() {
             viewModel.getTask(it)
         }
         binding.task.tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f)
-        binding.ibBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
+        setupBackButton()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.taskDetails.collect { task ->
                     task?.let {
                         initViews(task)
@@ -61,60 +60,76 @@ class TaskDetailsFragment : Fragment() {
         }
     }
 
+    private fun setupBackButton() {
+        binding.ibBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+    }
+
     private fun initViews(task: Task) {
+        updateTaskDetails(task)
+        updateUserComment(task)
+        updateStatusButtons(task)
+        setupStatusButtonActions(task)
+    }
+
+    private fun updateTaskDetails(task: Task) {
         binding.task.tvTitle.text = task.title
         binding.task.tvDueDate.text = DateUtil.formatDueDate(task.dueDate)
         binding.task.tvDaysLeft.text = DateUtil.calculateDaysLeft(task.dueDate, requireContext())
         binding.description.text = task.description
+    }
 
+    private fun updateUserComment(task: Task) {
         if (!task.userComment.isNullOrEmpty()) {
-            binding.userCommentLabel.visibility = VISIBLE
-            binding.userComment.visibility = VISIBLE
-            binding.separator3.visibility = VISIBLE
+            setViewVisibility(binding.userCommentLabel, binding.userComment, binding.separator3, visibility = VISIBLE)
             binding.userComment.text = task.userComment
+        } else {
+            setViewVisibility(binding.userCommentLabel, binding.userComment, binding.separator3,visibility = GONE)
         }
+    }
 
+    private fun setViewVisibility(vararg views: View, visibility: Int) {
+        views.forEach { it.visibility = visibility }
+    }
+
+    private fun updateStatusButtons(task: Task) {
         when (task.status) {
             TaskStatus.UNRESOLVED -> {
                 setTextColorBasedOnStatus(resources.getColor(R.color.st_red, requireContext().theme))
-                binding.ivTaskStatus.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.unresolved_sign, requireContext().theme))
+                setTaskStatusImage(R.drawable.unresolved_sign)
                 hideStatusButtons()
             }
             TaskStatus.RESOLVED -> {
                 binding.taskStatus.text = getText(R.string.resolved)
                 setTextColorBasedOnStatus(resources.getColor(R.color.st_green, requireContext().theme))
-                binding.ivTaskStatus.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.sign_resolved, requireContext().theme))
+                setTaskStatusImage(R.drawable.sign_resolved)
                 hideStatusButtons()
             }
             null -> {
                 showStatusButtons()
             }
         }
+    }
 
-        if (binding.btnResolve.visibility == VISIBLE && binding.btnCantResolve.visibility == VISIBLE) {
-            binding.btnResolve.setOnClickListener {
-                showAddCommentDialog { comment ->
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        viewModel.setTaskStatus(
-                            taskId = task.id,
-                            status = TaskStatus.RESOLVED,
-                            comment = comment
-                        )
-                    }
-                }
-            }
+    private fun setupStatusButtonActions(task: Task) {
+        if (binding.btnResolve.isVisible && binding.btnCantResolve.isVisible) {
+            setStatusButtonClickListener(binding.btnResolve, TaskStatus.RESOLVED, task)
+            setStatusButtonClickListener(binding.btnCantResolve, TaskStatus.UNRESOLVED, task)
+        }
+    }
 
-            binding.btnCantResolve.setOnClickListener {
-                showAddCommentDialog { comment ->
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        viewModel.setTaskStatus(
-                            taskId = task.id,
-                            status = TaskStatus.UNRESOLVED,
-                            comment = comment
-                        )
-                    }
-                }
+    private fun setStatusButtonClickListener(button: View, status: TaskStatus, task: Task) {
+        button.setOnClickListener {
+            showAddCommentDialog { comment ->
+                updateTaskStatus(task.id, status, comment)
             }
+        }
+    }
+
+    private fun updateTaskStatus(taskId: String, status: TaskStatus, comment: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.setTaskStatus(taskId = taskId, status = status, comment = comment)
         }
     }
 
@@ -123,6 +138,16 @@ class TaskDetailsFragment : Fragment() {
         binding.task.tvDueDate.setTextColor(color)
         binding.task.tvDaysLeft.setTextColor(color)
         binding.taskStatus.setTextColor(color)
+    }
+
+    private fun setTaskStatusImage(drawableRes: Int) {
+        binding.ivTaskStatus.setImageDrawable(
+            ResourcesCompat.getDrawable(
+                resources,
+                drawableRes,
+                requireContext().theme
+            )
+        )
     }
 
     private fun showStatusButtons() {

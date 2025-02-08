@@ -43,21 +43,26 @@ class TasksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recyclerView = binding.rvTasks
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        tasksListAdapter = TasksListAdapter(requireContext()) { taskId ->
-            taskSelected(taskId)
-        }
-        recyclerView.adapter = tasksListAdapter
-
+        setupRecyclerView()
         setOnClickListeners()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.tasks.collect { uiState ->
                     handleUiState(uiState)
                 }
             }
+        }
+    }
+
+    private fun setupRecyclerView() {
+        tasksListAdapter = TasksListAdapter { taskId ->
+            taskSelected(taskId)
+        }
+
+        binding.rvTasks.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = tasksListAdapter
         }
     }
 
@@ -91,13 +96,9 @@ class TasksFragment : Fragment() {
     }
 
     private fun updateNoTaskView(tasksForSelectedDate: List<Task>) {
-        if (tasksForSelectedDate.isEmpty()) {
-            binding.ivNoTasks.visibility = VISIBLE
-            binding.tvNoTasks.visibility = VISIBLE
-        } else {
-            binding.ivNoTasks.visibility = GONE
-            binding.tvNoTasks.visibility = GONE
-        }
+        val visibility = if (tasksForSelectedDate.isEmpty()) VISIBLE else GONE
+        binding.ivNoTasks.visibility = visibility
+        binding.tvNoTasks.visibility = visibility
     }
 
     private fun handleUiState(uiState: TasksViewModel.TasksUiState) {

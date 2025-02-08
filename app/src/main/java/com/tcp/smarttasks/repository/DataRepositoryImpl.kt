@@ -31,31 +31,37 @@ class DataRepositoryImpl @Inject constructor(
         return flow {
             if (!networkConnectivity.isConnected()) {
                 emit(Resource.Error("No Internet Connection"))
-            } else {
-                emit(Resource.Loading)
-                try {
-                    val response = tasksService.fetchTasks()
-                    if (response.isSuccessful) {
-                        response.body()?.let { networkTasks ->
-                            val tasks = networkTasks.tasks.filter {
-                                it.targetDate != null && it.title != null
-                            }.map { it.toDomain() }
+                return@flow
+            }
 
+            emit(Resource.Loading)
+
+            try {
+                val response = tasksService.fetchTasks()
+                when {
+                    response.isSuccessful -> {
+                        val networkTasks = response.body()?.tasks?.filter { it.targetDate != null && it.title != null } ?: emptyList()
+                        if (networkTasks.isNotEmpty()) {
+                            val tasks = networkTasks.map { it.toDomain() }
                             tasksDao.saveTasks(tasks.map { it.toEntity() })
                             emit(Resource.Success(tasks))
-                        } ?: emit(Resource.Error("Empty response body"))
-                    } else {
+                        } else {
+                            emit(Resource.Error("Empty response body"))
+                        }
+                    }
+                    else -> {
                         emit(Resource.Error("Error: ${response.message()}"))
                     }
-                } catch (e: Exception) {
-                    emit(Resource.Error(e.message ?: "Unknown Error Occurred"))
                 }
+            } catch (e: Exception) {
+                emit(Resource.Error(e.message ?: "Unknown Error Occurred"))
             }
         }.flowOn(ioDispatcher)
     }
 
     override fun getTask(taskId: String): Flow<Task> {
-        return tasksDao.getTaskWithAdditionalDataById(taskId).map { task -> task.toDomain() }
+        return tasksDao.getTaskWithAdditionalDataById(taskId)
+            .map { taskAdditionalData -> taskAdditionalData.toDomain() }
     }
 
     override suspend fun setTaskStatus(taskId: String, status: TaskStatus, comment: String) {
