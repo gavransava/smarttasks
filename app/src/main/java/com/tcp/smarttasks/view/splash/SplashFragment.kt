@@ -14,6 +14,7 @@ import com.tcp.smarttasks.databinding.FragmentSplashBinding
 import com.tcp.smarttasks.util.showErrorDialog
 import com.tcp.smarttasks.view.TasksViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -22,6 +23,10 @@ class SplashFragment : Fragment() {
 
     private lateinit var binding: FragmentSplashBinding
     private val viewModel: TasksViewModel by activityViewModels()
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        showErrorDialog(exception.localizedMessage)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,7 +39,7 @@ class SplashFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(exceptionHandler) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.tasks.collect { uiState ->
                     if (uiState is TasksViewModel.TasksUiState.Success) {
@@ -61,12 +66,8 @@ class SplashFragment : Fragment() {
             }
 
             is TasksViewModel.TasksUiState.Error -> {
-                showErrorDialog(TAG, uiState.message)
+                showErrorDialog(uiState.message)
             }
         }
-    }
-
-    companion object {
-        const val TAG = "SplashFragment"
     }
 }

@@ -21,8 +21,10 @@ import com.tcp.smarttasks.data.domain.TaskStatus
 import com.tcp.smarttasks.databinding.FragmentTaskDetailsBinding
 import com.tcp.smarttasks.util.DateUtil
 import com.tcp.smarttasks.util.showAddCommentDialog
+import com.tcp.smarttasks.util.showErrorDialog
 import com.tcp.smarttasks.view.TasksViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -30,6 +32,10 @@ class TaskDetailsFragment : Fragment() {
 
     private lateinit var binding: FragmentTaskDetailsBinding
     private val viewModel: TasksViewModel by activityViewModels()
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        showErrorDialog(exception.localizedMessage)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,7 +55,7 @@ class TaskDetailsFragment : Fragment() {
         binding.task.tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f)
         setupBackButton()
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(exceptionHandler) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.taskDetails.collect { task ->
                     task?.let {
@@ -128,7 +134,7 @@ class TaskDetailsFragment : Fragment() {
     }
 
     private fun updateTaskStatus(taskId: String, status: TaskStatus, comment: String) {
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(exceptionHandler) {
             viewModel.setTaskStatus(taskId = taskId, status = status, comment = comment)
         }
     }

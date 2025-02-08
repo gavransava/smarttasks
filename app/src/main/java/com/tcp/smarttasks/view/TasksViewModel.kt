@@ -7,6 +7,7 @@ import com.tcp.smarttasks.data.domain.TaskStatus
 import com.tcp.smarttasks.network.Resource
 import com.tcp.smarttasks.repository.DataRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -28,6 +29,11 @@ class TasksViewModel @Inject constructor(
     private val _taskDetails = MutableStateFlow<Task?>(null)
     val taskDetails: StateFlow<Task?> = _taskDetails
 
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Timber.e(exception)
+        _tasks.update { TasksUiState.Error(exception.message ?: "Something went wrong") }
+    }
+
     init {
         collectTasks()
     }
@@ -37,7 +43,7 @@ class TasksViewModel @Inject constructor(
      * from remote by calling fetchTasks
      */
     private fun collectTasks() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             dataRepositoryImpl.getAllTasks().filterNotNull().onStart {
                 fetchTasks()
             }.distinctUntilChanged().collect { taskList ->
@@ -74,7 +80,7 @@ class TasksViewModel @Inject constructor(
      */
     fun getTask(taskId: String) {
         _taskDetails.update { null }  // Clear earlier set task if any
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             dataRepositoryImpl.getTask(taskId).filterNotNull().distinctUntilChanged()
                 .collect { task ->
                     _taskDetails.update { task }

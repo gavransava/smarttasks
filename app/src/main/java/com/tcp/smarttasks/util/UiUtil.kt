@@ -64,11 +64,10 @@ fun AlertDialog.Builder.showErrorDialog(errorMessage: String, listener: () -> Un
 }
 
 fun Fragment.showErrorDialog(
-    tag: String,
     errorMessage: String?,
     dialogAction: (() -> Unit)? = null
 ) {
-    Timber.d("Error occurred on $tag:\n$errorMessage")
+    Timber.d("$errorMessage")
     AlertDialog.Builder(requireContext()).showErrorDialog(
         errorMessage ?: ""
     ) {

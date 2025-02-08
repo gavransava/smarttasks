@@ -20,6 +20,7 @@ import com.tcp.smarttasks.util.DateUtil
 import com.tcp.smarttasks.util.showErrorDialog
 import com.tcp.smarttasks.view.TasksViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -31,6 +32,10 @@ class TasksFragment : Fragment() {
     private lateinit var tasksListAdapter: TasksListAdapter
     private var selectedDate = LocalDate.now()
     private var tasksData = mutableListOf<Task>()
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        showErrorDialog(exception.localizedMessage)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +51,7 @@ class TasksFragment : Fragment() {
         setupRecyclerView()
         setOnClickListeners()
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(exceptionHandler) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.tasks.collect { uiState ->
                     handleUiState(uiState)
@@ -114,7 +119,7 @@ class TasksFragment : Fragment() {
             }
 
             is TasksViewModel.TasksUiState.Error -> {
-                showErrorDialog(TAG, uiState.message)
+                showErrorDialog(uiState.message)
             }
         }
     }
@@ -123,9 +128,5 @@ class TasksFragment : Fragment() {
         return data.filter {
             DateUtil.formatLocalDate(selectedDate) == it.targetDate
         }
-    }
-
-    companion object {
-        const val TAG = "TasksFragment"
     }
 }
